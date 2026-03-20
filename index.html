@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MarketPulse — Global Markets</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:#08090e;color:#e2e4e9;
+  min-height:100vh;max-width:480px;margin:0 auto;
+  overflow-x:hidden;
+}
+
+.pod-bar{
+  position:fixed;top:0;left:0;right:0;max-width:480px;margin:0 auto;
+  background:rgba(99,102,241,0.08);border-bottom:1px solid rgba(99,102,241,0.15);
+  padding:3px 16px;font-size:9px;color:#818cf8;font-weight:600;
+  display:flex;justify-content:space-between;z-index:100;
+  font-family:monospace;letter-spacing:0.3px;
+}
+
+.header{
+  padding:32px 20px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+.logo{font-size:19px;font-weight:800;letter-spacing:-0.5px}
+.logo span{color:#818cf8}
+
+.live-dot{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:#10b981;font-weight:600;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:blink 1.5s infinite}
+@keyframes blink{50%{opacity:.3}}
+
+/* Tabs */
+.tabs{
+  display:flex;gap:0;margin:8px 20px 16px;
+  border-radius:10px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.tab{
+  flex:1;padding:9px 0;text-align:center;
+  font-size:12px;font-weight:600;cursor:pointer;
+  background:#111318;color:#6b7280;transition:all .2s;
+}
+.tab.active{background:#818cf8;color:#fff}
+
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Section */
+.section{margin-bottom:20px}
+.section-head{
+  padding:0 20px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.section-title{font-size:13px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}
+.section-badge{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600}
+.badge-us{background:rgba(99,102,241,0.1);color:#818cf8}
+.badge-sea{background:rgba(16,185,129,0.1);color:#10b981}
+.badge-tech{background:rgba(236,72,153,0.1);color:#ec4899}
+
+/* Stock row */
+.stock-list{padding:0 20px}
+
+.stock-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.stock-row:last-child{border-bottom:none}
+
+.stock-logo{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;flex-shrink:0;
+}
+
+.stock-info{flex:1;min-width:0}
+.stock-ticker{font-size:14px;font-weight:700}
+.stock-name{font-size:11px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.stock-chart-mini{width:60px;height:28px;display:flex;align-items:flex-end;gap:1px}
+.mini-bar{flex:1;border-radius:1px;min-height:2px;transition:height .8s}
+.mini-bar.up{background:#10b981}
+.mini-bar.down{background:#ef4444}
+
+.stock-price{text-align:right;min-width:80px}
+.stock-val{font-size:14px;font-weight:700}
+.stock-chg{font-size:11px;font-weight:600;margin-top:1px}
+.chg-up{color:#10b981}
+.chg-down{color:#ef4444}
+
+/* Colors for stock logos */
+.bg-apple{background:rgba(255,255,255,0.08);color:#e2e4e9}
+.bg-msft{background:rgba(0,120,215,0.15);color:#0078d7}
+.bg-goog{background:rgba(66,133,244,0.15);color:#4285f4}
+.bg-amzn{background:rgba(255,153,0,0.15);color:#ff9900}
+.bg-meta{background:rgba(24,119,242,0.15);color:#1877f2}
+.bg-nvda{background:rgba(118,185,0,0.15);color:#76b900}
+.bg-tsla{background:rgba(232,33,39,0.15);color:#e82127}
+.bg-ibm{background:rgba(0,98,255,0.12);color:#0062ff}
+.bg-set{background:rgba(99,102,241,0.12);color:#818cf8}
+.bg-sti{background:rgba(16,185,129,0.12);color:#10b981}
+.bg-jkse{background:rgba(245,158,11,0.12);color:#f59e0b}
+.bg-psei{background:rgba(236,72,153,0.12);color:#ec4899}
+.bg-klci{background:rgba(6,182,212,0.12);color:#06b6d4}
+.bg-vni{background:rgba(239,68,68,0.12);color:#ef4444}
+
+/* Index cards */
+.index-cards{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:10px;padding:0 20px;margin-bottom:20px;
+}
+
+.index-card{
+  background:#111318;border:1px solid rgba(255,255,255,0.04);
+  border-radius:14px;padding:14px;
+}
+.idx-name{font-size:11px;color:#6b7280;font-weight:500}
+.idx-val{font-size:18px;font-weight:800;margin:4px 0 2px}
+.idx-chg{font-size:12px;font-weight:600}
+
+/* Bottom nav */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  max-width:480px;width:100%;
+  background:rgba(8,9,14,0.95);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.04);
+  display:flex;justify-content:space-around;
+  padding:8px 0 20px;
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;color:#6b7280;font-size:9px;font-weight:500;cursor:pointer;
+}
+.nav-item.active{color:#818cf8}
+.nav-icon{font-size:18px}
+
+.powered-strip{
+  margin:0 20px 100px;padding:10px 16px;
+  background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.1);
+  border-radius:10px;font-size:11px;color:#818cf8;
+  display:flex;align-items:center;gap:8px;
+}
+.powered-strip span{font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="pod-bar">
+  <span id="podName">Pod: loading...</span>
+  <span id="podTime"></span>
+</div>
+
+<div class="header">
+  <div class="logo">Market<span>Pulse</span></div>
+  <div class="live-dot"><div class="dot"></div>Live</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('mag7')">Mag 7 + Tech</div>
+  <div class="tab" onclick="switchTab('sea')">SEA Markets</div>
+</div>
+
+<!--============================================-->
+<!-- TAB: Mag 7 + Tech -->
+<!--============================================-->
+<div class="tab-panel active" id="tab-mag7">
+
+  <!-- US Index Cards -->
+  <div class="index-cards">
+    <div class="index-card">
+      <div class="idx-name">S&P 500</div>
+      <div class="idx-val" id="spIdx">5,234.18</div>
+      <div class="idx-chg chg-up" id="spIdxChg">▲ +0.45%</div>
+    </div>
+    <div class="index-card">
+      <div class="idx-name">NASDAQ</div>
+      <div class="idx-val" id="nasIdx">16,742.39</div>
+      <div class="idx-chg chg-up" id="nasIdxChg">▲ +0.82%</div>
+    </div>
+  </div>
+
+  <!-- Magnificent 7 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Magnificent 7</div>
+      <div class="section-badge badge-us">US Market</div>
+    </div>
+    <div class="stock-list" id="mag7List"></div>
+  </div>
+
+  <!-- IBM / Red Hat -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Red Hat (IBM)</div>
+      <div class="section-badge badge-tech">Enterprise Tech</div>
+    </div>
+    <div class="stock-list" id="ibmList"></div>
+  </div>
+
+</div>
+
+<!--============================================-->
+<!-- TAB: SEA Markets -->
+<!--============================================-->
+<div class="tab-panel" id="tab-sea">
+
+  <div class="index-cards">
+    <div class="index-card">
+      <div class="idx-name">🇹🇭 SET Index</div>
+      <div class="idx-val" id="setIdx">1,342.50</div>
+      <div class="idx-chg chg-up" id="setIdxChg">▲ +0.85%</div>
+    </div>
+    <div class="index-card">
+      <div class="idx-name">🇸🇬 STI</div>
+      <div class="idx-val" id="stiIdx">3,287.40</div>
+      <div class="idx-chg chg-up" id="stiIdxChg">▲ +0.32%</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Southeast Asia Indices</div>
+      <div class="section-badge badge-sea">SEA Region</div>
+    </div>
+    <div class="stock-list" id="seaList"></div>
+  </div>
+
+</div>
+
+<!-- Powered by -->
+<div class="powered-strip">
+  ⚡ <span>Powered by Red Hat OpenShift 4.21</span> — Auto-scaling & Self-healing
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active"><div class="nav-icon">📊</div>Markets</div>
+  <div class="nav-item"><div class="nav-icon">🔍</div>Screener</div>
+  <div class="nav-item"><div class="nav-icon">📰</div>News</div>
+  <div class="nav-item"><div class="nav-icon">⚙️</div>Settings</div>
+</div>
+
+<script>
+// Data
+const mag7 = [
+  {ticker:'AAPL', name:'Apple Inc.', price:178.52, css:'bg-apple', icon:''},
+  {ticker:'MSFT', name:'Microsoft Corp.', price:415.30, css:'bg-msft', icon:''},
+  {ticker:'GOOGL', name:'Alphabet (Google)', price:153.48, css:'bg-goog', icon:'G'},
+  {ticker:'AMZN', name:'Amazon.com Inc.', price:185.92, css:'bg-amzn', icon:''},
+  {ticker:'META', name:'Meta Platforms', price:502.14, css:'bg-meta', icon:'M'},
+  {ticker:'NVDA', name:'NVIDIA Corp.', price:878.35, css:'bg-nvda', icon:''},
+  {ticker:'TSLA', name:'Tesla Inc.', price:172.63, css:'bg-tsla', icon:'T'},
+];
+
+const ibm = [
+  {ticker:'IBM', name:'IBM Corp. (Red Hat parent)', price:193.42, css:'bg-ibm', icon:''},
+];
+
+const sea = [
+  {ticker:'SET', name:'🇹🇭 Stock Exchange of Thailand', price:1342.50, css:'bg-set', icon:'SET'},
+  {ticker:'STI', name:'🇸🇬 Straits Times Index', price:3287.40, css:'bg-sti', icon:'STI'},
+  {ticker:'JKSE', name:'🇮🇩 Jakarta Composite', price:7184.23, css:'bg-jkse', icon:'JKS'},
+  {ticker:'PSEi', name:'🇵🇭 Philippine SE Index', price:6542.18, css:'bg-psei', icon:'PSE'},
+  {ticker:'KLCI', name:'🇲🇾 Bursa Malaysia KLCI', price:1508.72, css:'bg-klci', icon:'KLC'},
+  {ticker:'VNI', name:'🇻🇳 Ho Chi Minh Index', price:1245.36, css:'bg-vni', icon:'VNI'},
+];
+
+// Render
+function miniChart(up) {
+  let bars = '';
+  for (let i = 0; i < 10; i++) {
+    const h = 4 + Math.random() * 24;
+    bars += `<div class="mini-bar ${up ? 'up' : 'down'}" style="height:${h}px"></div>`;
+  }
+  return `<div class="stock-chart-mini">${bars}</div>`;
+}
+
+function renderList(containerId, data) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = data.map(s => {
+    const chg = (Math.random() * 4 - 0.8).toFixed(2);
+    const up = chg >= 0;
+    const icon = s.icon || s.ticker.substring(0,2);
+    return `
+      <div class="stock-row">
+        <div class="stock-logo ${s.css}">${icon}</div>
+        <div class="stock-info">
+          <div class="stock-ticker">${s.ticker}</div>
+          <div class="stock-name">${s.name}</div>
+        </div>
+        ${miniChart(up)}
+        <div class="stock-price">
+          <div class="stock-val">${s.price.toLocaleString('en',{minimumFractionDigits:2})}</div>
+          <div class="stock-chg ${up?'chg-up':'chg-down'}">${up?'▲':'▼'} ${up?'+':''}${chg}%</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updatePrices() {
+  mag7.forEach(s => s.price *= (1 + (Math.random()-0.48)*0.006));
+  ibm.forEach(s => s.price *= (1 + (Math.random()-0.48)*0.005));
+  sea.forEach(s => s.price *= (1 + (Math.random()-0.48)*0.004));
+
+  renderList('mag7List', mag7);
+  renderList('ibmList', ibm);
+  renderList('seaList', sea);
+
+  // Index cards
+  function updIdx(valId, chgId, base) {
+    const v = base * (1 + (Math.random()-0.45)*0.003);
+    document.getElementById(valId).textContent = v.toLocaleString('en',{minimumFractionDigits:2});
+    const c = (Math.random()*2 - 0.4).toFixed(2);
+    const el = document.getElementById(chgId);
+    el.textContent = (c>=0?'▲ +':'▼ ') + Math.abs(c) + '%';
+    el.className = 'idx-chg ' + (c>=0?'chg-up':'chg-down');
+    return v;
+  }
+  updIdx('spIdx','spIdxChg',5234);
+  updIdx('nasIdx','nasIdxChg',16742);
+  updIdx('setIdx','setIdxChg',1342);
+  updIdx('stiIdx','stiIdxChg',3287);
+}
+
+renderList('mag7List', mag7);
+renderList('ibmList', ibm);
+renderList('seaList', sea);
+
+setInterval(updatePrices, 4000);
+
+// Tabs
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// Pod info
+document.getElementById('podName').textContent = 'Pod: ' + location.hostname;
+setInterval(() => {
+  document.getElementById('podTime').textContent = new Date().toLocaleTimeString();
+}, 1000);
+</script>
+
+</body>
+</html>
